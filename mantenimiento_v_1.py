@@ -1,119 +1,276 @@
+''' Mantenimiento en una base de datos Xampp, base labuenataza Tabla:ventas
+Version 1
+**** vamos a implementar una inserción de venta *****
+alt - 201 ╔
+    - 187 ╗
+    - 200 ╚
+    - 188 ╝
+    - 186 ║
+    - 205 ═
+    '''
 '''
-Mantenimiento en una base de datos XAMPP MariaDb, base labuenataza 
-Tabla: Ventas
-Versión 1 
-***** 
-se implemento inserción, consulta, actualización y borrado de venta
-***** 
-alt + 186-187-200-201-205 = ╚ ╔ ═ 
-https://elcodigoascii.com.ar/ 
+Menú con Case
 '''
+# llamados de archivo de sistema
+from conectorBD import *       # importar el archivo de conexión
+from validarV import *         # importa el archivo de validación
+from reporteTotalBD import *   # importa el reporte total de ventas
+from datetime import datetime  # archivo interno al cual llamo una función
+import mysql.connector         # llamado al conector
+import math 
+import subprocess
 
-
-#llamados de archivo de sistema
-from connectorBD import* #importar el archivo de conexion
-from validar import* #importar el archivo de validacion
-from reporteTotalDB import* #importar el archivo de reporte total
-from datetime import datetime #importar la libreria de fecha y hora
-import mysql.connector #importar la libreria de mysql
-import math
-import subprocess #subprocess.run(["ls", "-l"]) #para ejecutar comandos de consola
-import os #para limpiar pantalla en Linux (Codespaces) y Windows
-
-#funcion limpiar pantalla
-def limpiar():
-    os.system('clear' if os.name != 'nt' else 'cls')
+#función de saludo
+def saludo(nombre):
+    if nombre != '':
+        print('Bienvenido(a): ', nombre)
+    else:
+        print('Bienvenido(a), la próxima vez el nombre por favor')
+    return()
+#función de despedida
+def despedida(nombre):
+    print("Fue un gusto servirte ", nombre)
     return()
 
-#funcion encabezado
+#función limpiar pantalla
+def limpiar():
+    subprocess.run("cls", shell=True)
+
+# función encabezado
 def encabezado():
     fecha = datetime.now()
-    print(f'* {fecha.day}-{fecha.month}-{fecha.year}')
-    print('***************************')
+    print('****************')
+    print(f'{fecha.day}-{fecha.month}-{fecha.year}')
+    print('****************')
     titulo = '''
-    ╔══════════════════════════════════════════════════════════════╗
-    ║                       MANTENIMIENTO SISTEMA                  ║
-    ║                       Base De Datos                          ║
-    ║                       Python - MySql v.1                     ║
-    ╚══════════════════════════════════════════════════════════════╝
-    '''
+    ╔═════════════════════════════════════════════╗
+    ║ ******** SISTEMA DE MANTENIMIENTO ********* ║
+    ║                                             ║
+    ║          **** Base de datos ****            ║
+    ║                                             ║ 
+    ║          ****Python - MySQL v.1 ****        ║
+    ║                                             ║
+    ╚═════════════════════════════════════════════╝
+'''
     print(titulo)
-    return()
+    return
 
-#funcion menu
+#función menú
 def menu():
     opciones = ('''
-     ╔══════════════════════════════════════════════════════════════╗
-     ║                       MANTENIMIENTO SISTEMA                  ║
-     ║                       Tabla Clientes                         ║
-     ║                       Python - MySql v.1                     ║
-     ║                       1: => Insertar Cliente                 ║
-     ║                       2: => Consultar Clientes               ║
-     ║                       3: => Actualizar Cliente               ║
-     ║                       4: => Reporte Total Clientes           ║ 
-     ║                       5: => Borrar Cliente                   ║
-     ║                       6: => Salir                            ║
-     ╚══════════════════════════════════════════════════════════════╝
-    ''')
-    print(opciones)
-    return()
+    ╔═══════════════════════════════════════════════════╗
+    ║       ********    MENÚ DE OPCIONES   ******       ║
+    ║       *                                   *       ║
+    ║       *               VENTAS              *       ║
+    ║       *************************************       ║
+    ║                                                   ║            
+    ║           1: => Insertar    Venta   ****          ║
+    ║                                                   ║                
+    ║           2: => Consultar   Venta   ****          ║
+    ║                                                   ║
+    ║           3: => Actualizar  Venta   ****          ║
+    ║                                                   ║
+    ║           4: => Reporte   General   ****          ║
+    ║                                                   ║            
+    ║           5: => Borrar      Venta   ****          ║
+    ║                                                   ║
+    ║           6: =>   SALIR             ****          ║
+    ║                                                   ║
+    ╚═══════════════════════════════════════════════════╝
+    '''
+    )
+    print(opciones)  
+    return
 
-encabezado()
-menu()
-
-#funcion insertar venta
-def insertar_cliente():
-    limpiar()
-    print('**** INSERTAR CLIENTE ****')
-    print('*****************************')
-    print('Ingrese los datos del cliente')
+#función insertar venta
+def insertarVenta():
+    limpiar() #clear
+    print('***      Ingreso de Venta     ***')
+    print('*********************************')
+    print('**  Digite datos de la venta   **')
     #captura de datos
-    id = input('Ingrese el ID del cliente: ')
-    nombre = input('Ingrese el nombre del cliente: ')
-    pape = input('Ingrese el primer apellido del cliente: ')
-    sape = input('Ingrese el segundo apellido del cliente: ')
-    movil = input('Ingrese el número de móvil del cliente: ')
-    correo = input('Ingrese el correo electrónico del cliente: ')
-    direccion = input('Ingrese la dirección fisica del cliente: ')
-    fecha = input('Ingrese la fecha de registro (YYYY-MM-DD): ')
-    fechaB = datetime.strptime(fecha, '%Y-%m-%d')  # Convertir a formato de fecha   
-    estado = input('Ingrese el estado del cliente (activo/inactivo): ')
-    #proceso para insertar datos en la tabla clientes
+    fecha = input('Digite la fecha:  ejemplo 01/01/2026 ')
+    fechaB = datetime.strptime(fecha, '%d/%m/%Y') #para capturar fecha en español
+    desc = input('Digite la descripción: ')
+    precio = input('Digite el precio: ') #validar como decimal
+    impuesto = input('Digite el impuesto: ') #validar como decimal
+    total = input('Digite el total: ') #validar como decimal
+    cantidad1 = input('Digite la cantidad: ') #validar como entero
+    cantidad = validar(cantidad1, 1)
+    #cantidad = validar(cantidad1, 2)
+    pago1 = input('Digite la forma de pago: ')
+    pago = validar(pago1, 2)
+    cliente = input('Digite el cliente: ')
+    producto = input('Digite el producto: ')  
+    #proceso para insertar datos
     cur = cnn.cursor()
-    sql = ('''INSERT INTO `clientes`(`cliId`, `cliNom`, `cliPape`, `cliSape`, `cliMovil`, 
-           `cliCorreo`, `cliDireccion`, `cliFecReg`, `cliEstado`) 
-            VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}')'''.format(id, nombre, pape, sape, movil, correo, direccion, fechaB, estado))
+    sql = ('''INSERT INTO `ventas`(`ventId`, `ventFecha`, `ventDesc`,
+    `ventPrecio`, `ventImpue`, `ventTotal`, `ventCant`, `ventPago`, `idCliente`, `idProductos`)
+    VALUES('{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')'''.format('', fechaB, desc, precio, impuesto,
+        total, cantidad, pago, cliente, producto))
     cur.execute(sql)
     cnn.commit()
-    cur.close()
+    cur.close()    
+    return
 
-#funcion consultar cliente
-def consultar_cliente():
-    limpiar()
-    print('**** CONSULTAR CLIENTE ****')
-    print('*****************************')
-    #captura de datos
-    consulta = input('Ingrese el ID del cliente a consultar: ')
-    cur = cnn.cursor()
-    cur.execute('''SELECT * FROM `clientes` WHERE `cliId` = {}'''.format(consulta,))
-    datos_db = cur.fetchall() #fetchall() para traer todos los datos de la consulta
+#función consulta de venta
+def consultarVenta():
+    limpiar() #clear
+    print('***      Consulta de Venta     ***')
+    print('*********************************')
+    consulta = input('Digite el código de venta: ')
+    cur = cnn.cursor()  #crear un curso para acceso a la base de datos
+    cur.execute('''SELECT * FROM `ventas` WHERE `ventId` = {}'''.format(consulta))
+    datos_db = cur.fetchall() #con fetcha all trae todos los datos de fila o tupla
     if len(datos_db) != 0:
         for campos in datos_db:
-            print('** Registro de cleinte numero: ', campos[0])
-            print('Nombre: ', campos[1])
-            print('Primer Apellido: ', campos[2])
-            print('Segundo Apellido: ', campos[3])
-            print('Número de móvil: ', campos[4])
-            print('Correo electrónico: ', campos[5])
-            print('Dirección: ', campos[6])
-            print('Fecha de Registro: ', campos[7])
-            print('Estado: ', campos[8])
+            print('** Registro de Ventas número: ',campos[0])
+            fecha = campos[1]
+            fecha = datetime.strftime(fecha, '%d/%m/%Y')
+            print()
+            print('Fecha de venta: ',       fecha)
+            print('Descripción de venta: ', campos[2])
+            print('Precio de venta: ',      campos[3])
+            print('Impuesto de venta: ',    campos[4])
+            print('Total de venta: ',       campos[5])
+            print('Cantidad de venta: ',    campos[6])
+            print('Tipo de venta: ',        campos[7])
+            print('Cliente de venta: ',     campos[8])
+            print('Proveedores de venta: ', campos[9])
     else:
-        print('No se encontraron resultados')
+        print()
+        print('¡Número de venta no encontrada!')
+        print()
     cur.close()
     return()
 
-encabezado()
-menu()
-#insertar_cliente()
-consultar_cliente()
+#función actualizar venta
+def actualizarVenta():
+    limpiar() #clear
+    print('***      Actualizar de Venta     ***')
+    print('************************************')
+    consulta = input('Digite el código de venta: ')
+    cur = cnn.cursor()  #crear un curso para acceso a la base de datos
+    cur.execute('''SELECT * FROM `ventas` WHERE `ventId` = {}'''.format(consulta))
+    datos_db = cur.fetchall() #con fetcha all trae todos los datos de fila o tupla
+    if len(datos_db) != 0:
+        for campos in datos_db:
+            print('** Registro de Ventas número: ',campos[0])
+            fecha = campos[1]
+            fecha = datetime.strftime(fecha, '%d/%m/%Y')
+            print()
+            print('Fecha de venta: ',       fecha)
+            print('Descripción de venta: ', campos[2])
+            print('Precio de venta: ',      campos[3])
+            print('Impuesto de venta: ',    campos[4])
+            print('Total de venta: ',       campos[5])
+            print('Cantidad de venta: ',    campos[6])
+            print('Tipo de venta: ',        campos[7])
+            print('Cliente de venta: ',     campos[8])
+            print('Proveedores de venta: ', campos[9])
+
+        respuesta = input('Seguro que deseas actualizar el registro: S/N ')
+        respuesta = respuesta.upper()
+        if respuesta == 'S':
+            print('** Registro de Ventas número: ',campos[0])
+            print('****************************************')
+            #captura de datos
+            fecha = input('Digite la fecha:  ejemplo 01/01/2026 ')
+            fechaB = datetime.strptime(fecha, '%d/%m/%Y') #para capturar fecha en español
+            desc = input('Digite la descripción: ')
+            precio = input('Digite el precio: ')
+            impuesto = input('Digte el impuesto: ')
+            total = input('Digite el total: ')
+            cantidad = input('Digite la cantidad: ')
+            pago = input('Digite la forma de pago: ')
+            cliente = input('Digite el cliente: ')
+            producto = input('Digite el producto: ')  
+            cur = cnn.cursor()
+            sql = '''UPDATE `ventas` SET `ventFecha`='{}',
+                `ventDesc`='{}',`ventPrecio`='{}',`ventImpue`='{}',
+                `ventTotal`='{}',`ventCant`='{}',`ventPago`='{}',
+                `idCliente`='{}',`idProductos`='{}' WHERE `ventId` = {}'''.format(fechaB, desc, precio, impuesto,
+                total, cantidad, pago, cliente, producto, consulta)
+            cur.execute(sql)
+            cnn.commit()
+            cur.close()
+            print(f'Registro de ventas #{campos[0]} has sido actualizado con éxito!')
+        else:
+            print('¡No se actulizó ningún registro!')
+    else:
+        print()
+        print('¡Número de venta no encontrada!')
+        print()
+    return
+
+#función borrar datos
+def borrarVenta():
+    factura = input('Digite el número de pedido que desea borrar: ')
+    cur = cnn.cursor()  #crear un curso para acceso a la base de datos
+    cur.execute('''SELECT * FROM `ventas` WHERE `ventId` = {}'''.format(factura))
+    datos_db = cur.fetchall() #con fetcha all trae todos los datos de fila o tupla
+    if len(datos_db) != 0:
+        for campos in datos_db:
+            print('** Registro de Ventas número: ',campos[0])
+            fecha = campos[1]
+            fecha = datetime.strftime(fecha, '%d/%m/%Y')
+            print()
+            print('Fecha de venta: ',       fecha)
+            print('Descripción de venta: ', campos[2])
+            print('Precio de venta: ',      campos[3])
+            print('Impuesto de venta: ',    campos[4])
+            print('Total de venta: ',       campos[5])
+            print('Cantidad de venta: ',    campos[6])
+            print('Tipo de venta: ',        campos[7])
+            print('Cliente de venta: ',     campos[8])
+            print('Proveedores de venta: ', campos[9])
+        respuesta = input('¿Seguro que deseas eliminar el registro: S/N? ')
+        respuesta = respuesta.upper()
+        if respuesta == 'S':
+            cur.execute('''DELETE FROM `ventas` WHERE `ventId` = {}'''.format(factura))
+            cnn.commit()
+            cur.close()
+            print('¡Registro de venta ha sido eliminado exitosamente!')
+        else:
+            print('¡No se elimino ningún registro!')
+    else:
+        print()
+        print('¡Archivo no encontrado!')    
+    return()
+
+#********************** Principal o MAIN  *************************
+def main():
+    cantidad, cliente, proveedores = int, int, int
+    fecha, ventId, desc, pago = str, str, str, str
+    precio, impuesto, total = float, float, float
+    continuar = True
+   
+    while continuar:
+        nombre = input('Digite su nombre: ')
+        saludo(nombre)
+        encabezado()
+        menu()
+        opc1 = input('Seleccione una opción: ')
+        opc = validar(opc1, 1)
+        match opc1:
+            case "1":
+                insertarVenta()
+            case "2":
+                consultarVenta()
+            case "3":
+                actualizarVenta()
+            case "4":
+                consultaG()
+            case "5":
+                borrarVenta()
+            case "6":
+                cnn.close() #para cerrar la conexión de la base de datos
+                break
+            case _:
+                print('Opción no es válida...')
+        input('Digite cualquier tecla para continuar...')
+    print('Estamos para servirte, Muchas gracias.')
+    despedida(nombre)
+
+if __name__ == '__main__':
+        main()
