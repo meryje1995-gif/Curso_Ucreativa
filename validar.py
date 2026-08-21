@@ -1,10 +1,39 @@
-'''
-Este archivo no existía en el proyecto original: mantenimiento_v_1.py hace
-"from validar import*" pero nunca se subió el módulo, así que el import
-fallaba con ModuleNotFoundError apenas se ejecutaba el script.
+# FUNCIÓN validar con valores
 
-Se deja aquí como stub (mismo criterio que reporteTotalDB.py) para que el
-import no truene. Aquí pueden ir, por ejemplo, funciones de validación de
-datos de entrada (validar_fecha, validar_correo, validar_movil, etc.) para
-usarlas en insertar_cliente() y actualizar_cliente().
-'''
+def validar(valida, valor):  # validación de variable entero
+    if valor == 1:
+        while True:
+            if valida.isdigit():
+                valida = int(valida)
+                return (valida)
+                break #salida del while
+            else:
+                print('Debes escribir un número entero!')
+                print('-------------------------------')
+                valida = input('¡Error! Digite número: ')
+
+    # validación de la variable vacía
+    elif valor == 2:
+        while True:
+            if len(valida) > 0:
+                valida = str(valida)
+                return valida
+                break
+            else:
+                print('Debes escribir texto en esta opción!')
+                print('------------------------------------')
+                valida = input('¡Error! Digite Texto: ')
+
+    # Función que valida un número flotante
+def valFloat(valida):
+    while True:
+        try:
+            valida = float(valida)
+            return valida
+        except ValueError:
+            print('Debes digitar un número flotante.')
+            print('----------------------------------')
+            valida = input('Error!, Digite el tipo de dato solicitado: ')
+
+
+            
